@@ -21,6 +21,7 @@ WORKDIR /app
 # UV-safety patch before byte-compiling the backend.
 COPY bundle_parts /tmp/bundle_parts
 COPY patches/refine_glb_v528.py.xz.b64 /tmp/refine_glb_v528.py.xz.b64
+COPY patches/refiner_v529.py.xz.b64 /tmp/refiner_v529.py.xz.b64
 
 RUN cat /tmp/bundle_parts/backend.part.* > /tmp/backend.tar.xz.b64 \
     && base64 -d /tmp/backend.tar.xz.b64 > /tmp/backend.tar.xz \
@@ -28,10 +29,12 @@ RUN cat /tmp/bundle_parts/backend.part.* > /tmp/backend.tar.xz.b64 \
     && tar -xJf /tmp/backend.tar.xz -C /app \
     && base64 -d /tmp/refine_glb_v528.py.xz.b64 | xz -d > /app/blender/refine_glb.py \
     && echo "080b0b8cb73c223f8bf697fd31292473072aef7977dd02b83a79f26c8cada34d  /app/blender/refine_glb.py" | sha256sum -c - \
+    && base64 -d /tmp/refiner_v529.py.xz.b64 | xz -d > /app/app/refiner.py \
+    && echo "51ec0f2985c366a18b2d91a13fc8366ac3b73c8b10cf64dacd19eeeb36dc8f3b  /app/app/refiner.py" | sha256sum -c - \
     && test -f /app/requirements.txt \
     && python3 -m pip install --break-system-packages --no-cache-dir -r /app/requirements.txt \
     && python3 -m py_compile /app/app/*.py /app/blender/refine_glb.py \
-    && rm -rf /tmp/backend.tar.xz /tmp/backend.tar.xz.b64 /tmp/bundle_parts /tmp/refine_glb_v528.py.xz.b64
+    && rm -rf /tmp/backend.tar.xz /tmp/backend.tar.xz.b64 /tmp/bundle_parts /tmp/refine_glb_v528.py.xz.b64 /tmp/refiner_v529.py.xz.b64
 
 RUN mkdir -p /data/jobs
 
