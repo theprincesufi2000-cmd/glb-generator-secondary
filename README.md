@@ -1,32 +1,29 @@
 # GLB Generator Secondary Backend
 
-Secondary Railway backend for GLB Generator Pro v5.2.4.
+Verified Secondary Railway backend for GLB Generator Pro.
 
-## Why this repository exists
+## Production
 
-The upstream `blenderkit/headless-blender` image starts a VNC desktop through its inherited ENTRYPOINT. A direct Railway image service therefore returned HTTP 502 because Uvicorn never listened on port 8000.
+- Public URL: `https://glb-generator-secondary-github-production.up.railway.app`
+- Health: `/health`
+- Port: `8000`
+- Verified deployment: `cb064714-7e3b-4528-9898-7af382ec0422`
+- Verified source commit: `cce805d051612446c0736d7621cdeea3f8848f25`
 
-This Dockerfile fixes that by clearing the inherited entrypoint with:
+The public health endpoint returns HTTP 200.
+
+## Runtime fix
+
+The upstream `blenderkit/headless-blender` image starts a VNC desktop through its inherited ENTRYPOINT. A direct image deployment therefore produced HTTP 502 because Uvicorn was not listening on port 8000.
+
+This repository fixes the runtime with:
 
 ```dockerfile
 ENTRYPOINT []
 ```
 
-and then starts the tested GLB backend on Railway's `PORT`.
+The backend source bundle is split into GitHub-safe chunks under `bundle_parts/`, reconstructed during Docker build, and SHA-256 verified before extraction. Uvicorn is then the foreground API process.
 
-## Railway
+## Railway variables
 
-Required variables:
-
-- `BACKEND_XZ_B64` — tested backend bundle
-- `GLB_CLIENT_TOKEN`
-- `GLB_DATA_DIR=/data`
-- `GLB_PUBLIC_BASE_URL=https://<secondary-domain>`
-- `GLB_BLENDER_EXECUTABLE=/home/headless/blender/blender`
-- `GLB_BLENDER_TIMEOUT_SECONDS=5400`
-- `GLB_WORKER_POLL_SECONDS=2`
-- `GLB_PROVIDER_RETRY_MINUTES=180`
-
-Healthcheck: `/health`
-
-Container port: `8000`
+Configure the application variables used by the backend, including the client token, public base URL, data directory, Blender executable, worker polling, timeouts, and fidelity limits. Secrets should remain in Railway variables rather than this repository.
