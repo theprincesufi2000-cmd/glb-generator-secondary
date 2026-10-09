@@ -22,7 +22,7 @@ RUN base64 -d /tmp/backend_v540.tar.xz.b64 > /tmp/backend_v540.tar.xz \
     && tar -xJf /tmp/backend_v540.tar.xz -C /app \
     && test -f /app/app/main.py \
     && test -f /app/blender/multiview_baker.py \
-    && python3 -m pip install --break-system-packages --no-cache-dir -r /app/requirements.txt \
+    && python3 -m pip install --break-system-packages --no-cache-dir --ignore-installed -r /app/requirements.txt \
     && python3 -m py_compile /app/app/*.py /app/blender/*.py \
     && rm -f /tmp/backend_v540.tar.xz.b64 /tmp/backend_v540.tar.xz
 
