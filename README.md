@@ -1,29 +1,23 @@
 # GLB Generator Secondary Backend
 
-Verified Secondary Railway backend for GLB Generator Pro.
+Railway secondary production backend for GLB Generator Pro.
 
-## Production
-
+## Runtime
+- Release source: v5.4.0 multiview baking, 2D/3D calibration and UV seam/occlusion processing.
 - Public URL: `https://glb-generator-secondary-github-production.up.railway.app`
 - Health: `/health`
 - Port: `8000`
-- Verified deployment: `cb064714-7e3b-4528-9898-7af382ec0422`
-- Verified source commit: `cce805d051612446c0736d7621cdeea3f8848f25`
+- Image: `blenderkit/headless-blender:blender-4.5-stable`
 
-The public health endpoint returns HTTP 200.
+## Source packaging
+`backend_v540.tar.xz.b64` contains source under `app/`, `blender/` and `requirements.txt`.
+`Dockerfile` verifies SHA-256 of the decoded archive before unpacking it.
+Older v5.2.x `bundle_parts/` and `patches/` are legacy and are not used by this Dockerfile.
 
-## Runtime fix
+## Security
+Keep tokens, backend settings and private values in Railway environment variables.
+Never commit secrets into GitHub.
 
-The upstream `blenderkit/headless-blender` image starts a VNC desktop through its inherited ENTRYPOINT. A direct image deployment therefore produced HTTP 502 because Uvicorn was not listening on port 8000.
-
-This repository fixes the runtime with:
-
-```dockerfile
-ENTRYPOINT []
-```
-
-The backend source bundle is split into GitHub-safe chunks under `bundle_parts/`, reconstructed during Docker build, and SHA-256 verified before extraction. Uvicorn is then the foreground API process.
-
-## Railway variables
-
-Configure the application variables used by the backend, including the client token, public base URL, data directory, Blender executable, worker polling, timeouts, and fidelity limits. Secrets should remain in Railway variables rather than this repository.
+## Validation
+Railway health check is configured in `railway.toml` as `/health`.
+Functional Blender bake quality must be tested using a genuine multi-view job.
